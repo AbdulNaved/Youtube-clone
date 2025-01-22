@@ -1,37 +1,35 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react'
+import {useDispatch} from "react-redux";
 import { setCategory } from '../utils/appSlice';
 
-function ButtonList() {
-    const buttonList = [
-        "All", "Trending", "Music","News","Web Series","Shorts", "Live", "JavaScript", "Java",  "Gaming", "Vlogs", "Coding", "Live", "Songs", "Comedy", "Cricket", "Shorts", "Computer Programming", "New to you"
-    ];
-    const [active, setActive] = useState("All");
-    const dispatch = useDispatch(); 
+const buttonList = ["All", "Javascript", "Java", "Live", "Music", "Songs", "Vlogs", "Trending", "Programming", "News", "Technology", "Cricket", "Comedy", "Thriller", "New to you", "Computer Programming", "Netlify", "Coding"]
 
-    const videoByTag = (tag) => {
-        if (active !== tag) {
-            dispatch(setCategory(tag));
-            setActive(tag);
-        }
-    };
+const ButtonList = () => {
+  const [active, setActive] = useState("All");
+  const dispatch = useDispatch();
 
-    return (
-        <div className='flex py-3 overflow-x-scroll no-scrollbar mt-20'>
-            {buttonList.map((buttonName, index) => (
-                <button 
-                    onClick={() => videoByTag(buttonName)}
-                    key={index} 
-                    className={` ${active === buttonName ? "bg-slate-800 text-white" : "bg-gray-200"} px-4 py-1 rounded-lg font-medium mx-2 cursor-pointer whitespace-nowrap`}
-                >
-                    {buttonName}
-                </button>
-            ))}
-        </div>
-    );
+  const videoByTag = (tag) => {
+    if (active !== tag) {
+      dispatch(setCategory(tag));
+      setActive(tag);
+    }
+  }
+  console.log(active);
+
+  return (
+    <div className='flex w-full overflow-x-scroll no-scrollbar my-1'>
+      {
+        buttonList.map((buttonName, index) => {
+          return (
+            <div key={index}>
+              <button onClick={() => { videoByTag(buttonName) }} className={`${active === buttonName ? "bg-slate-900 text-white" : "bg-gray-200"} w-fit font-medium mx-1 cursor-pointer px-3 py-2 rounded-lg`}><span className="whitespace-nowrap">{buttonName}</span></button>
+            </div>
+          )
+        })
+      }
+
+    </div>
+  )
 }
 
-export default ButtonList;
-
-
-
+export default ButtonList
