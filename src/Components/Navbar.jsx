@@ -1,144 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { RiVideoAddLine } from "react-icons/ri";
+import { CiVideoOn } from "react-icons/ci";
 import Avatar from "react-avatar";
 import { CiSearch } from "react-icons/ci";
-import { useDispatch, useSelector } from "react-redux";
-import { setCategory, togglesidebar, setSearchSuggestion } from "../utils/appSlice";
+import { useDispatch, useSelector } from "react-redux"
+import { toggleSidebar, setCategory, setSearchSuggestion } from "../utils/appSlice";
+import { useState } from "react";
+import { SEARCH_SUGGESTIONS_API } from "../constant/youtube";
 import axios from "axios";
-import { SEARCH_SUGGESTION_API } from "../Constant/Youtube";
 
-function Navbar() {
-  const [input, setInput] = useState("");
-  const [suggestionVisible, setSuggestionVisible] = useState(false);
-  const dispatch = useDispatch();
-  const { searchSuggestion, open } = useSelector((store) => store.app);
+const Navbar = () => {
+    const [input, setInput] = useState("");
+    const [suggestion, setSuggestion] = useState(false);
+    const dispatch = useDispatch();
+    const { searchSuggestion } = useSelector((store) => store.app);
 
-  const searchVideo = () => {
-    if (input.trim() !== "") {
-      dispatch(setCategory(input));
-      setInput("");
-      setSuggestionVisible(false);
+    const searchVideo = () => {
+        dispatch(setCategory(input));
+        setInput("");
     }
-  };
 
-  const toggleSidebar = () => {
-    console.log('Toggle sidebar clicked'); // Debug statement
-    dispatch(togglesidebar());
-  };
-
-  const showSuggestion = async () => {
-    if (input.trim() === "") {
-      setSuggestionVisible(false);
-      return;
+    const toggleHandler = () => {
+        dispatch(toggleSidebar());
     }
-    try {
-      const res = await axios.get(`${SEARCH_SUGGESTION_API}${input}`);
-      dispatch(setSearchSuggestion(res.data[1] || []));
-      setSuggestionVisible(true);
-    } catch (error) {
-      console.error('Error fetching search suggestions:', error);
+
+    const showSuggestion = async () => {
+        try {
+            const res = await axios.get(SEARCH_SUGGESTIONS_API + input);
+            dispatch(setSearchSuggestion(res?.data[1]))
+        } catch (error) {
+            console.log(error);
+        }
     }
-  };
 
-  const openSuggestion = () => {
-    setSuggestionVisible(true);
-    showSuggestion();
-  };
+    const openSuggestion = () => {
+        setSuggestion(true);
+    }
 
-  useEffect(() => {
-    showSuggestion();
-  }, [input]);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            showSuggestion();
+        }, 200)
 
-  return (
-    <div className="fixed top-0 z-10 flex flex-col sm:flex-row justify-center items-center w-full bg-white shadow-md">
-      <div className="px-5 flex justify-between w-full max-w-7xl items-center">
-        <div className="flex items-center">
-          <GiHamburgerMenu
-            onClick={toggleSidebar}
-            size={"24px"}
-            className="cursor-pointer"
-          />
-          <img
-            width={"115px"}
-            src="../assets/naved1.png"
-            alt="Logo"
-            className="ml-3"
-          />
-        </div>
-        <div className="flex w-[40%] items-center hidden sm:flex relative">
-          <div className="flex w-full">
-            <input
-              onFocus={openSuggestion}
-              className="w-full outline-none py-2 px-4 border-2 border-gray-400 rounded-l-full"
-              type="text"
-              placeholder="Search"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && searchVideo()}
-            />
-            <button
-              onClick={searchVideo}
-              className="py-2 border px-4 border-gray-400 rounded-r-full"
-            >
-              <CiSearch size={25} />
-            </button>
-          </div>
-          {suggestionVisible && searchSuggestion.length > 0 && (
-            <div className="absolute top-12 z-50 bg-white w-full shadow-lg rounded-lg border border-gray-200">
-              <ul>
-                {searchSuggestion.map((text, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center px-4 hover:bg-gray-200"
-                    onClick={() => {
-                      setInput(text);
-                      searchVideo();
-                    }}
-                  >
-                    <CiSearch size="24px" />
-                    <li className="px-3 py-1 cursor-pointer text-md font-medium">
-                      {text}
-                    </li>
-                  </div>
-                ))}
-              </ul>
+        return () => {
+            clearTimeout(timer);
+        }
+
+    }, [input])
+
+    return (
+        <div className="flex fixed top-0 justify-center items-center w-[100%] z-10 bg-white">
+            <div className="flex w-[96%] py-3 justify-between items-center">
+
+                <div className="flex items-center ">
+                    <GiHamburgerMenu onClick={toggleHandler} size="24px" className="cursor-pointer" />
+                    <img className="px-4" width={"115px"} src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/768px-YouTube_Logo_2017.svg.png" alt="yt_logo" />
+                </div>
+                <div className="flex w-[40%] items-center">
+                    <div className="flex w-[100%] ">
+                        <input value={input} onFocus={openSuggestion} onChange={(e) => setInput(e.target.value)} type="text" placeholder="Search" className="w-full py-2 px-4 border border-gray-400 rounded-l-full outline-none" />
+                        <button onClick={searchVideo} className="py-2 border border-gray-400 rounded-r-full px-4"><CiSearch size="24px" /></button>
+                    </div>
+                    {
+                        (suggestion && searchSuggestion.length !== 0) &&
+                        <div className="absolute top-3 z-50 w-[30%] py-5 bg-white shadow-lg mt-12 rounded-lg border border-gray-200">
+                            <ul>
+                                {
+                                    searchSuggestion.map((text, idx) => {
+                                        return (
+                                            <div className="flex items-center px-4 hover:bg-gray-100">
+                                                <CiSearch size="24px" />
+                                                <li className="px-2 py-1 cursor-pointer text-md font-medium">{text}</li>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                </div>
+
+
+
+                <div className="flex w-[10%] justify-between items-center">
+                    <IoIosNotificationsOutline size={"24px"} className="cursor-pointer" />
+                    <CiVideoOn size={"24px"} className="cursor-pointer" />
+                    <Avatar src="https://play-lh.googleusercontent.com/C9CAt9tZr8SSi4zKCxhQc9v4I6AOTqRmnLchsu1wVDQL0gsQ3fmbCVgQmOVM1zPru8UH=w240-h480-rw" size={35} round={true} />
+                </div>
+
             </div>
-          )}
         </div>
-        <div className="flex w-[10%] justify-between items-center">
-          <IoIosNotificationsOutline size={25} className="cursor-pointer" />
-          <RiVideoAddLine size={25} className="cursor-pointer" />
-          <Avatar
-            src="https://images.pexels.com/photos/810775/pexels-photo-810775.jpeg?auto=compress&cs=tinysrgb&w=600"
-            className="cursor-pointer"
-            size={35}
-            round={true}
-          />
-        </div>
-      </div>
-      <div className="flex w-full items-center sm:hidden px-5 py-2">
-        <div className="w-full py-2 px-4 border-2 border-gray-400 rounded-full">
-          <input
-            className="w-full outline-none"
-            type="text"
-            placeholder="Search"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && searchVideo()}
-          />
-        </div>
-        <button
-          onClick={searchVideo}
-          className="py-2 border px-4 border-gray-400 rounded-full"
-        >
-          <CiSearch size={25} />
-        </button>
-      </div>
-    </div>
-  );
+    );
 }
-
 export default Navbar;
-
