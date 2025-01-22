@@ -1,43 +1,34 @@
-import React from 'react';
-import Navbar from './Components/Navbar';
-import Sidebar from './Components/Sidebar';
-import Feed from './Components/Feed';
-import Body from './Components/Body';
-import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
-import Watch from './Components/Watch';
+import Body from "./components/Body";
+import Navbar from "./components/Navbar";
 
-const AppLayout = () => (
-  <div>
-    <Navbar />
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-grow overflow-hidden ">
-        <Outlet />
-      </div>
-    </div>
-  </div>
-);
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Watch from "./components/Watch";
+import Feed from "./components/Feed";
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: <Body />,
     children: [
       {
         path: "/",
-        element: <Feed />,
+        element: <Feed />
       },
       {
-        path: "watch",
-        element: <Watch />,
-      },
-    ],
-  },
-]);
+
+        path: "/watch",
+        element: <Watch />
+      }
+    ]
+  }
+])
 
 function App() {
   return (
-    <RouterProvider router={appRouter} />
+    <div>
+      <Navbar />
+      <RouterProvider router={appRouter} />
+    </div>
   );
 }
 
