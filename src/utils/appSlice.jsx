@@ -1,29 +1,29 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from "@reduxjs/toolkit";
 
 const appSlice = createSlice({
-  name: 'app',
-  initialState: {
-    open: true,
-    video: [],
-    category: "All",
-    searchSuggestion: [],
-  },
-  reducers: {
-    togglesidebar: (state) => {
-      state.open = !state.open;
+    name:"app",
+    initialState:{
+        open:true, 
+        video:[],
+        category:"All",
+        searchSuggestion:[],
     },
-    setHomeVideo: (state, action) => {
-      state.video = action.payload;
-    },
-    setCategory: (state, action) => {
-      state.category = action.payload; // Fix capitalization issue here
-    },
-    setSearchSuggestion: (state, action) => {
-      state.searchSuggestion = action.payload;
-    },
-  },
+    reducers:{
+        // action
+        toggleSidebar:(state)=>{
+            state.open = !state.open;
+        },
+        setHomeVideo:(state,action)=>{
+            state.video = action.payload;
+        },
+        setCategory:(state,action)=>{
+            state.category = action.payload;
+        },
+        setSearchSuggestion:(state,action)=>{
+            state.searchSuggestion = action.payload;
+        }
+         
+    } 
 });
-
-export const { togglesidebar, setHomeVideo, setCategory, setSearchSuggestion } = appSlice.actions;
+export const {toggleSidebar,setHomeVideo,setCategory,setSearchSuggestion} = appSlice.actions;
 export default appSlice.reducer;
-
