@@ -1,41 +1,39 @@
-import React, { useEffect } from "react";
-//import ChatMessage from "./ChatMessage";
-import ChatMessage from "./ChatMessege";
-import { useDispatch, useSelector } from "react-redux";
-import { setMessage } from '../utils/ChatSlice';
-import { generateRandomMessage, generateRandomName } from "../utils/Helper";
+import React, { useEffect } from 'react'
+import ChatMessage from './ChatMessage';
+import { useSelector } from "react-redux";
+import {useDispatch} from "react-redux";
+import { setMessage } from '../utils/chatSlice';
+import { generateRandomName, generateRandomMessage } from '../utils/helper';
 
-const Livechat = () => {
-  const messages = useSelector((state) => state.chat.messages);
-  const dispatch = useDispatch();
+const LiveChat = () => {
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      dispatch(
-        setMessage({
-          name: generateRandomName(),
-          message: generateRandomMessage(16),
+    const message = useSelector((store) => store.chat.message);
+    const dispatch = useDispatch();
+    useEffect(()=>{
+       const timer = setInterval(()=>{
+            dispatch(setMessage({name:generateRandomName(), message:generateRandomMessage(16)}));
+        },1000)
+
+        return(()=>{
+            clearInterval(timer)
         })
-      );
-    }, 1000);
+        
+    },[])
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [dispatch]);
+    return (
+        <div className='px-4 py-1'>
+            <div>
+                {
+                    message.map((item,idx) => {
+                        return (
+                            <ChatMessage key={idx} item={item}/>
+                        )
+                    })
+                }
 
-  return (
-    <div className="h-full overflow-y-auto p-4">
-      <div className="space-y-2">
-        {messages.map((item, idx) => (
-          <ChatMessage key={idx} item={item} />
-        ))}
-      </div>
-    </div>
-  );
-};
+            </div>
+        </div>
+    )
+}
 
-export default Livechat;
-
-
-
+export default LiveChat
